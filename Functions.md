@@ -6,7 +6,7 @@
  - [`Math & Functions`](#math--functions)
  - [`Variables`](#Variables)
  - [`Internal Variables`](#internal-variables)
- - [`Example Scripts`](#Example-Scripts)
+ - [`Example Functions`](#Example-Functions)
 
 ## Overview
 
@@ -23,11 +23,11 @@ example:
 Workspace <- workspace
 
 0:Wall <- function call
-  color:[0,1,1,1] <- parameter
-  scale:[1,1,1] <- parameter
+  color:[0,1,1,1] <- parameter ^ Wall
+  scale:[1,1,1] <- parameter ^ Wall
   
 var:Variable <- variable instance
-  data:2 <- parameter
+  data:2 <- parameter ^ Variable
 ```
 
 All the available functions are listed below
@@ -114,24 +114,9 @@ Noodle Extensions/Chroma/Other properties that can be used on most functions
 
 Most of these properties are directly connected to their corresponding Noodle/Chroma property written in JSON. 
 
-("" = put in quotes, ? = optional)
+(`""` = put in quotes, `?` = optional)
 
-### Position Notes
-> x = **left-right**, y = **up-down**, z = **forward-backward** 
-
-> 0,0,0  Is on the ground in the center of the lanes
-### Scale Notes
-
-> x = **width** extending from the right, y = **hight** extending from the top , z = **length** extending from the back
-
-### Time Notes
-
-> t = **time of any given animation event**, relative to the object duration (0.0 - 1.0)
-
-> t 0.5 = halfway through the objects lifetime,
-
-
-[`Notes and Obstacles`](https://github.com/Aeroluna/NoodleExtensions#objects-notes-and-obstacles)
+[`Notes and Obstacles`](https://github.com/Aeroluna/Heck/wiki/Objects#notes--obstacles)
 - NJSOffset: float
 - NJS: float
 - Interactable: bool
@@ -140,29 +125,29 @@ Most of these properties are directly connected to their corresponding Noodle/Ch
 - Rotation: \[x,y,z] or float
 - LocalRotation: \[x,y,z]
 
-[`Notes`](https://github.com/Aeroluna/NoodleExtensions#notes)
+[`Notes`](https://github.com/Aeroluna/Heck/wiki/Objects#notes)
 - CutDirection: float
 - DisableNoteGravity: bool
 - DisableNoteLook: bool
 
-[`Obstacles`](https://github.com/Aeroluna/NoodleExtensions#obstacles)
+[`Obstacles`](https://github.com/Aeroluna/Heck/wiki/Objects#obstacles)
 - Scale: \[x,y?,z?]
 
-[`Tracks`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#tracks)
+[`Tracks`](https://github.com/Aeroluna/Heck/wiki/Animation#tracks)
 
 - Track: string, or \["t1","t2"...] for multiple tracks
-- [`AnimateDefinitePosition`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_definiteposition): \[x,y,z,t,"e"?]
-- [`AnimatePosition`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_position): \[x,y,z,t,"e"?]
-- [`AnimateDissolve`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_dissolve): \[d,t,"e"?]
-- [`AnimateDissolveArrow`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_dissolvearrow): \[d,t,"e"?]
-- [`AnimateColor`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_color): \[r,g,b,a,t,"e"?]
-- [`AnimateRotation`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_rotation): \[x,y,z,t,"e"?]
-- [`AnimateLocalRotation`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_dissolve): \[x,y,z,t,"e"?]
-- [`AnimateScale`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_scale): \[x,y,z,t,"e"?]
-- [`AnimateInteractable`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_interactable):\[i,t]
-- [`AnimateTime`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#_time):\[t,t,"e"?]
+- [`AnimateDefinitePosition`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_definiteposition): \[x,y,z,t,"e"?]
+- [`AnimatePosition`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_position): \[x,y,z,t,"e"?]
+- [`AnimateDissolve`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_dissolve): \[d,t,"e"?]
+- [`AnimateDissolveArrow`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_dissolvearrow): \[d,t,"e"?]
+- [`AnimateColor`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_color): \[r,g,b,a,t,"e"?]
+- [`AnimateRotation`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_rotation): \[x,y,z,t,"e"?]
+- [`AnimateLocalRotation`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_dissolve): \[x,y,z,t,"e"?]
+- [`AnimateScale`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_scale): \[x,y,z,t,"e"?]
+- [`AnimateInteractable`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_interactable):\[i,t]
+- [`AnimateTime`](https://github.com/Aeroluna/Heck/wiki/AnimationProperties#_time):\[t,t,"e"?]
 
-[`Chroma`](https://github.com/Aeroluna/Chroma#chroma)
+[`Chroma`](https://github.com/Aeroluna/Heck/wiki/Objects#chroma)
 
  - Color: \[r,g,b,a] (0-1)
  - RGBColor:\[r,g,b,a] (0-255)
@@ -187,10 +172,24 @@ Most of these properties are directly connected to their corresponding Noodle/Ch
  - Log: prints things to the console. useful for checking the value of internal variables. ex: `Log:hi retrx!`
  - \#  is used at the start of a blank line for a comment
 
-Usefull links:
- - [`Noodle documentation`](https://github.com/Aeroluna/NoodleExtensions) 
- - [`Noodle Animation documentation`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md)
- - [`Chroma documentation`](https://github.com/Aeroluna/Chroma)
+Useful links
+ - [`Heck Documentation`](https://github.com/Aeroluna/Heck/wiki)
+
+Additional Info
+
+### Position
+> x = **left-right**, y = **up-down**, z = **forward-backward** 
+
+> 0,0,0  Is on the ground in the center of the lanes
+### Scale Walls
+
+> x = **width** extending from the right, y = **hight** extending from the top , z = **length** extending from the back
+
+### Time Notes
+
+> t = **time of any given animation event**, relative to the object duration (0.0 - 1.0)
+
+> t 0.5 = halfway through the objects lifetime,
 
 # Math & Functions
 Math expressions are computed inside of { } symbols. A random floating point number is yielded from the function `Random(val1,val2)`. A random integer is yielded from the line function `RandomInt(val1,val2)`.
@@ -209,7 +208,7 @@ Math expressions are computed inside of { } symbols. A random floating point num
   color:HSLtoRGB({repeat/100},1,0.5)
   ```
   
-![](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Readme/rainbow.png)
+![](Images/rainbow.png)
   
 The example above uses the HSLtoRGB function to create a rainbow.
 
@@ -320,7 +319,7 @@ Variables that are auto created and changed internally. All repeatable functions
   position:[{repeat/8},{Sin(repeat/2)}]
   ```
 
-![](https://github.com/thelightdesigner/ScuffedWalls/blob/1.0/Readme/sine.png)
+![](Images/sine.png)
 
 
 
@@ -334,7 +333,7 @@ Appending means to add on or to merge two sets of data. The append function will
  - appendTechnique: int(0-2)
  - onTrack: string, only appends to walls on this track
  - selectlineindex: int,int,int (defaults to 0,1,2,3)
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
   Example
  ```ruby
@@ -362,20 +361,20 @@ multiplies all the definitepositions by 3 except for the time value
 a very scuffed way to make a rainbow
 
 
-![](https://github.com/thelightdesigner/ScuffedWalls/blob/1.0/Readme/color.png)
+![](Images/color.png)
 
 
-[`a less scuffed way to make a rainbow`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#math--functions)
+[`a less scuffed way to make a rainbow`](Functions.md#math--functions)
 
 ## AppendNotes
-adds on noodle/chroma data to notes between the function time and endtime (toBeat)
+Appends data to notes between the function time and endtime (toBeat)
 
  - Function Time => starting beat of selection (only append notes after...)
  - toBeat: float => ending beat of selection (only append notes before...)
  - selecttype: int,int,int (defaults to 0,1,2,3), only appends to notes with the specified type(s), see [`here`](https://bsmg.wiki/mapping/map-format.html#notes-2) for info on \_type
  - appendTechnique: int(0-2)
  - onTrack: string, only appends to notes on this track
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
   Example
 ```ruby
@@ -415,11 +414,11 @@ multiplies all the definitepositions by 3 except for the time value
    ```
 
 ## AppendEvents
-adds on custom chroma data to events/lights between the function time and endtime (toBeat)
+Appends data to events between the function time and endtime (toBeat)
 
  - toBeat: float
- - appendTechnique: int(0-2)
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - appendTechnique: int(0-1)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  - selecttype: 0, 1, 2, 3; the type of the light to append to
 
  Example
@@ -433,11 +432,8 @@ adds on custom chroma data to events/lights between the function time and endtim
 
  ## AppendTechnique
 The merge priority of the values being appended
- - 0 = Low Priority (Will not overwrite any property but can still append to nulled properties)
- - 1 = High Priority (Can overwrite any property)
- - 2~4 = ??? (Dont use these)
-
-**default is 0**
+ - 0 = Low Priority, Will not overwrite any property but can still append to nulled properties (default)
+ - 1 = High Priority, Can overwrite any property
 
 ## Append Function Internal Variables
 The append function runs through each object in a workspace and changes its data.
@@ -454,23 +450,23 @@ granted this only works if every object has a  `_definitePosition` with a value 
 confusing right?
 
 
-![](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Readme/internalvar.jpg)
+![](Images/internalvar.jpg)
 
-![](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Readme/repeatvar.jpg)
+![](Images/repeatvar.jpg)
 
 
 
 ## TextToWall
 Constructs text out of walls
 
-Rizthesnuggies [`Intro to TextToWall`](https://www.youtube.com/watch?v=g49gfMtzETY) function
+Rizthesnuggies [`Intro to TextToWall`](https://www.youtube.com/watch?v=g49gfMtzETY) tutorial
 
-see [here](https://github.com/thelightdesigner/ScuffedWalls/blob/main/TextToWall.md) for how the program reads font images/models.
+see [here](TextToWall.md) for how the program reads font images/models.
 
  - path: string
  - fullpath string
  - refreshonsave: bool, refreshes scuffedwalls when the file at the specified path is modified
- - line: string, the text you want to convert to walls. [this can be repeated](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Readme/linetext.jpg) to add more lines of text.
+ - line: string, the text you want to convert to walls. [this can be repeated](Images/linetext.jpg) to add more lines of text.
  - letting: float, the relative space between letters. default: 1
  - leading: float, the relative space between lines. default: 1
  - size: float, scales the text. default: 1 (gigantic)
@@ -482,7 +478,7 @@ see [here](https://github.com/thelightdesigner/ScuffedWalls/blob/main/TextToWall
  - Position => moves the text by this amount, defaults to \[0,0]
  - all the other imagetowall params if your really interested
  - all the other modeltowall params if your really interested
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
  Example
  ```ruby
@@ -506,9 +502,9 @@ see [here](https://github.com/thelightdesigner/ScuffedWalls/blob/main/TextToWall
 ## ModelToWall
 
 (repeatable)
-constructs a model out of walls. see [here](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Blender%20Project.md) for more info
+constructs a model out of walls. see [here](Blender%20Project.md) for more info
 
-Rizthesnuggies [`Intro to ModelToWall`](https://youtu.be/FfHGRbUdV_k) function
+Rizthesnuggies [`Intro to ModelToWall`](https://youtu.be/FfHGRbUdV_k) tutorial
 
 
  - path: string
@@ -536,7 +532,7 @@ Rizthesnuggies [`Intro to ModelToWall`](https://youtu.be/FfHGRbUdV_k) function
  - deltascale: float, scales the model around the center of its bounding box
  - setdeltaposition: bool
  - setdeltascale: bool
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  - repeat: int
  - repeataddtime: float
  
@@ -557,9 +553,9 @@ Rizthesnuggies [`Intro to ModelToWall`](https://youtu.be/FfHGRbUdV_k) function
 
 ## ImageToWall
 
-constructs an image out of walls as pixels
+Constructs an image out of walls as pixels
 
-Rizthesnuggies [`Intro to ImageToWall`](https://youtu.be/Cxbc4llIq3k) function
+Rizthesnuggies [`Intro to ImageToWall`](https://youtu.be/Cxbc4llIq3k) tutorial
 
  - path: string
  - fullpath string
@@ -578,7 +574,7 @@ Rizthesnuggies [`Intro to ImageToWall`](https://youtu.be/Cxbc4llIq3k) function
  - compression: float, how much to compress the wall image, Not linear in the slightest. recommended value(0-0.1) default: 0
  - Position => moves each pixel by this amount, defaults to \[0,0]
  - Alpha: the alpha value
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
   Example
 ```ruby
@@ -731,7 +727,7 @@ adds in map objects from other map.dat files
 (repeatable)
 makes a wall
 
-Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) function
+Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) tutorial
 
 - duration: float
 - definitedurationbeats: float, makes the walls stay around for exactly this long in beats
@@ -739,7 +735,7 @@ Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) function
  - definitetime: beats/seconds, makes the walls jump in at exactly the function time in seconds or beats
 - repeat: int, amount of times to repeat
 - repeatAddTime: float
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
 
  Example
 ```ruby
@@ -773,11 +769,13 @@ Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) function
 (repeatable)
 makes a note
 
-Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) function
+While it is possible, ScuffedWalls does not serve as a usable alternative to note mapping. The `Note` function is recommended for creating procedural effects only.
+
+Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) tutorial
 
 - repeat: int, amount of times to repeat
 - repeatAddTime: float
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
 - type:int
 - cutDirection:int
 
@@ -815,7 +813,7 @@ these properties use \_noteJumpStartBeatOffset to adjust the notes duration
 (repeatable)
 makes an [`AnimateTrack`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#AnimateTrack) custom event
 
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  - easing: string
  - repeat: int, amount of times to repeat
  - repeatAddTime: float
@@ -857,7 +855,7 @@ makes an [`AssignPathAnimation`](https://github.com/Aeroluna/NoodleExtensions/bl
 ## AssignPlayerToTrack
 makes an [`AssignPlayerToTrack`](https://github.com/Aeroluna/NoodleExtensions/blob/master/Documentation/AnimationDocs.md#AssignPlayerToTrack) custom event
 
- - any of [`these properties`](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Functions.md#noodle-extensionschroma-properties-syntax)
+ - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  - track: string
  - easing: string
  
@@ -906,5 +904,5 @@ don't ever call this
 
 :)
 
-# [Example Scripts](https://github.com/thelightdesigner/ScuffedWalls/blob/main/Example%20Scripts.md)
+# [Example Functions](Example%20Functions.md)
 ^Moved to a seperate file for clarity

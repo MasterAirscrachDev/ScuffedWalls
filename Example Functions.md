@@ -1,7 +1,7 @@
-# Script Examples
-A Compilation Of Pre-made ScuffedWalls Scripts
+# Function Examples
+A Compilation Of Pre-made ScuffedWalls Functions
 
-## Script Complexity
+## Complexity
  - [`Simple`](#Simple)
  - [`Medium`](#Medium)
  - [`Advanced`](#Advanced)
@@ -28,7 +28,7 @@ A Compilation Of Pre-made ScuffedWalls Scripts
    Color:[0,2,0,40]
    Interactable:false
 ```
-![](https://cdn.discordapp.com/attachments/635693570698772490/895688320363925564/unknown.png)
+![](Images/EffectExamples/Alpha01.png)
 
 ### Add more tracks to objects - theligtdesibegh r
 ```ruby
@@ -53,7 +53,7 @@ XXX:AppendToAllNotesBetween
    NJS:13
    NJSOffset:3
 ```
-Example: ![here](https://github.com/MasterAirscrachDev/ScuffedWalls/blob/BetterDocs/Non-Static/Walk.mp4?raw=true)
+EXAMPLE: <https://cdn.discordapp.com/attachments/869471669356474408/897438240288702464/BloqWalkLFS.gif>
 
 
 ### Red bomb helix - totally balloon
@@ -63,13 +63,13 @@ XXX:note
    repeataddtime:0.05
    rotation:[0,0,{repeat*15}]
    position:[0,4,0]
-   selecttype:3
    disableNoteGravity:true
    disableNoteLook:true
    fake:true
    interactable:false
    color:[1,0,0,1]
 ```
+EXAMPLE: <https://cdn.discordapp.com/attachments/869471669356474408/897432477671497748/BloqSpinLFS.gif>
 
 # Advanced
 
@@ -118,10 +118,12 @@ XXX:Wall
    animatedefiniteposition:[0,0,5,0],[0,0,5,1]
    animatecolor:[1,0,0,1,0.2],[1,1,0,1,0.4],[0,1,0,1,0.6],[0,1,1,1,0.8],[0,0,1,1,1]
 ```
+EXAMPLE: <https://cdn.discordapp.com/attachments/869471669356474408/897438105873842216/CircleLFS.gif>
+
 
 ### Circle generator - iswimfly
  ```ruby
- #The total amount of walls
+#The total amount of walls
 var:amount
 data:60
 
@@ -171,3 +173,4 @@ X:Wall
    localrotation:[0,0,{33.8+rot}]
    position:[{sx},{sy}]
 ```
+![](Images/EffectExamples/Ring.png)
