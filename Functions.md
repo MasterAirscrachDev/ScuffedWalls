@@ -18,7 +18,7 @@ Functions in ScuffedWalls are always called by stating a time value and the name
 
 example:
 
-[//]: # (I Added ruby syntax highlighing to commands, its not perfect but its still nicer to read than pure white)
+[//]: # (I Added ruby syntax highlighing to commands, its not perfect but its still nicer to read than pure white -UPDATE- nvm its just a bug with my vsc plugin, looks fine on github) 
 ```ruby
 Workspace <- workspace
 
@@ -901,7 +901,7 @@ use this function by downloading the repo and navigating to ScuffedWalls>Program
 is this stupid? yes.
 
 
-# Uwu
+# UwU
 don't ever call this
 
 :)

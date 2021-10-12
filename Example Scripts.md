@@ -1,7 +1,7 @@
 # Script Examples
-A Cheat Sheet For Various Noodle And Chroma Effects
+A Compilation Of Pre-made ScuffedWalls Scripts
 
-## Contents
+## Script Complexity
  - [`Simple`](#Simple)
  - [`Medium`](#Medium)
  - [`Advanced`](#Advanced)
@@ -53,6 +53,8 @@ XXX:AppendToAllNotesBetween
    NJS:13
    NJSOffset:3
 ```
+Example: ![here](https://github.com/MasterAirscrachDev/ScuffedWalls/blob/BetterDocs/Non-Static/Walk.mp4?raw=true)
+
 
 ### Red bomb helix - totally balloon
 ```ruby
