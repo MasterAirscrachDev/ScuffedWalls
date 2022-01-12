@@ -7,7 +7,12 @@ namespace ScuffedWalls
 {
     public class Parameter : INameStringDataPair, ICloneable
     {
-        public static Func<Parameter, string> Exposer => var => var.Name;
+        public Parameter Use()
+        {
+            WasUsed = true;
+            return this;
+        }
+        public static Func<Parameter, string> Exposer => var => var.Clean.Name;
         public static void UnUseAll(IEnumerable<Parameter> parameters)
         {
             foreach (var p in parameters) p.WasUsed = false;
@@ -18,20 +23,22 @@ namespace ScuffedWalls
         }
         public bool WasUsed { get; set; }
         public StringComputationExcecuter Computer { get; private set; }
-        public Lookup<AssignableInlineVariable> Variables { get; private set; }
-        public static Lookup<AssignableInlineVariable> ConstantVariables { get; private set; } = new Lookup<AssignableInlineVariable>(AssignableInlineVariable.Exposer);
+        public TreeList<AssignableInlineVariable> Variables => Computer.Variables;
         public Parameter(string line, int index)
         {
             Line = line;
             GlobalIndex = index;
             Raw = Variable.Parse(line);
-            Variables = new Lookup<AssignableInlineVariable>(AssignableInlineVariable.Exposer);
-            Computer = new StringComputationExcecuter(Variables);
+            Computer = new StringComputationExcecuter();
+        }
+        public Parameter(string name, string data)
+        {
+            Raw = new Variable(name, data);
         }
         public Variable Raw { get; private set; } = new Variable();
-        public Variable Clean => new Variable(Name?.ToLower().RemoveWhiteSpace(), StringData?.ToLower().RemoveWhiteSpace());
+        public Variable Clean => new Variable(Raw?.Name?.ToLower().RemoveWhiteSpace(), Raw?.StringData?.ToLower().RemoveWhiteSpace());
         public int GlobalIndex { get; private set; }
-        public string Line { get; private set; } = "";
+        public string Line { get; private set; }
         public string Name
         {
             get => Raw.Name; //support for name computing soon
@@ -43,7 +50,7 @@ namespace ScuffedWalls
 
         public string StringData
         {
-            get => Computer.Parse(Raw.StringData);
+            get => Raw.StringData != null ? Computer.Parse(Raw.StringData) : null;
             set
             {
                 Raw.StringData = value;
@@ -57,6 +64,11 @@ namespace ScuffedWalls
         public object Clone()
         {
             return new Parameter(Line, GlobalIndex);
+        }
+
+        public static void AssignVariables(IEnumerable<Parameter> parameters, TreeList<AssignableInlineVariable> variables)
+        {
+            foreach (var param in parameters) param.Variables.Register(variables);
         }
     }
     /*

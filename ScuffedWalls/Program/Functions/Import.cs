@@ -9,19 +9,20 @@ namespace ScuffedWalls.Functions
     [SFunction("Import")]
     class Import : ScuffedFunction
     {
-        public override void Run()
+        string Path;
+        int[] Type;
+        float startbeat;
+        float addtime;
+        float endbeat;
+        protected override void Init()
         {
-            FunLog();
-
-
-            string Path = GetParam("path", string.Empty, p => System.IO.Path.Combine(Utils.ScuffedConfig.MapFolderPath, p));
+            Path = GetParam("path", string.Empty, p => System.IO.Path.Combine(Utils.ScuffedConfig.MapFolderPath, p));
             Path = GetParam("fullpath", DefaultValue: Path, p => p);
-            AddRefresh(Path);
-            int[] Type = GetParam("type", new int[] { 0, 1, 2, 3, 4, 5 }, p => p.Split(",").Select(a => Convert.ToInt32(a)).ToArray());
-            float startbeat = Time;
-            float addtime = GetParam("addtime", 0, p => float.Parse(p));
-            float endbeat = GetParam("tobeat", float.PositiveInfinity, p => float.Parse(p));
-
+            AddRefresh(Path); 
+            Type = GetParam("type", new int[] { 0, 1, 2, 3, 4, 5 }, p => p.Split(",").Select(a => Convert.ToInt32(a)).ToArray()); 
+            startbeat = Time;
+            addtime = GetParam("addtime", 0, p => float.Parse(p));
+            endbeat = GetParam("tobeat", float.PositiveInfinity, p => float.Parse(p));
 
             BeatMap beatMap = JsonSerializer.Deserialize<BeatMap>(File.ReadAllText(Path), Utils.DefaultJsonConverterSettings);
             BeatMap filtered = new BeatMap();
@@ -43,12 +44,10 @@ namespace ScuffedWalls.Functions
             }
             if (beatMap._customData != null && Type.Any(t => t == 3))
             {
-                InstanceWorkspace.CustomData = TreeDictionary.Merge(InstanceWorkspace.CustomData, beatMap._customData, TreeDictionary.MergeType.Arrays, TreeDictionary.MergeBindingFlags.HasValue);
+                TreeDictionary.Merge(InstanceWorkspace.CustomData, beatMap._customData, TreeDictionary.MergeType.Arrays, TreeDictionary.MergeBindingFlags.HasValue);
             }
-            foreach (var stat in filtered.Stats) ConsoleOut(stat.Key, stat.Value, Time, "Import");
+            Stats.AddStats(filtered.Stats);
             InstanceWorkspace.Add(filtered);
-
-            Parameter.ExternalVariables.RefreshAllParameters();
         }
     }
 }

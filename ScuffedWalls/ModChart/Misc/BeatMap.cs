@@ -1,10 +1,9 @@
 ﻿using ScuffedWalls;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace ModChart
 {
@@ -16,29 +15,32 @@ namespace ModChart
     public interface ITimeable
     {
         public float? _time { get; set; }
+        public float GetTime();
     }
     public class MapStatAttribute : Attribute
     {
 
     }
+
     public class BeatMap : ICloneable
     {
-        public List<KeyValuePair<string, int>> Stats => GetStats();
-        public List<KeyValuePair<string, int>> GetStats()
+        [JsonIgnore]
+        public MapStats Stats => GetStats();
+        public MapStats GetStats()
         {
-            List<KeyValuePair<string, int>> stats = new List<KeyValuePair<string, int>>();
+            MapStats stats = new MapStats();
             foreach (var prop in typeof(BeatMap).GetProperties().Where(p => p.GetCustomAttributes<MapStatAttribute>().Any()))
             {
                 object val = prop.GetValue(this);
                 if (val is IEnumerable<object> array && array.Count() > 0)
                 {
                     int count = array.Count();
-                    stats.Add(new KeyValuePair<string, int>(Extensions.MakePlural(prop.Name, count), count));
+                    stats.AddStat(new KeyValuePair<string, int>(Extensions.MakePlural(prop.Name, count), count));
                 }
             }
             foreach (var item in _customData)
             {
-                if (item.Value is IEnumerable<object> aray && aray.Count() > 0) stats.Add(new KeyValuePair<string, int>(Extensions.MakePlural(item.Key, aray.Count()), aray.Count()));
+                if (item.Value is IEnumerable<object> aray && aray.Count() > 0) stats.AddStat(new KeyValuePair<string, int>(Extensions.MakePlural(item.Key, aray.Count()), aray.Count()));
             }
             return stats;
         }
@@ -69,6 +71,10 @@ namespace ModChart
         }
 
         public const string
+               _height = "_height",
+               _attenuation = "_attenuation",
+               _offset = "_offset",
+               _startY = "_startY",
                _position = "_position",
                _localPosition = "_localPosition",
                _scale = "_scale",
@@ -88,13 +94,15 @@ namespace ModChart
                _duplicate = "_duplicate",
                _customEvents = "_customEvents",
                _pointDefinitions = "_pointDefinitions",
+               _worldpositionstays = "_worldpositionstays",
                _bookmarks = "_bookmarks",
                _environment = "_environment",
                _BPMChanges = "_BPMChanges",
                AnimateTrack = "AnimateTrack",
                AssignPathAnimation = "AssignPathAnimation",
                AssignPlayerToTrack = "AssignPlayerToTrack",
-               AssignTrackParent = "AssignTrackParent";
+               AssignTrackParent = "AssignTrackParent",
+               AssignFogTrack = "AssignFogTrack";
         public void Prune()
         {
             _customData.DeleteNullValues();
@@ -156,7 +164,7 @@ namespace ModChart
             return false;
 
         }
-        public void OrderCustomEventLists()
+        public void Order()
         {
             string[] Keys = _customData.Keys.ToArray();
 
@@ -167,6 +175,12 @@ namespace ModChart
                     _customData[key] = array.OrderBy(obj => ((IDictionary<string, object>)obj)["_time"].ToFloat()).ToList();
                 }
             }
+
+            _events = _events.OrderBy(obj => obj.GetTime()).ToList();
+
+            _notes = _notes.OrderBy(obj => obj.GetTime()).ToList();
+
+            _obstacles = _obstacles.OrderBy(obj => obj.GetTime()).ToList();
         }
 
         public class Event : ICustomDataMapObject, ICloneable
@@ -197,7 +211,7 @@ namespace ModChart
                 FlashRed = 6,
                 FadeRed = 7
             }
-            public float GetTime() => float.Parse(_time.ToString());
+            public float GetTime() => _time.Value;
             public float? _time { get; set; }
             public Type? _type { get; set; }
             public Value? _value { get; set; }
@@ -235,7 +249,7 @@ namespace ModChart
                 DownRight = 7,
                 Dot = 8
             }
-            public float GetTime() => float.Parse(_time.ToString());
+            public float GetTime() => _time.Value;
             public float? _time { get; set; }
             public int? _lineIndex { get; set; }
             public int? _lineLayer { get; set; }
@@ -264,7 +278,7 @@ namespace ModChart
                 FullHeight = 0,
                 Crouch = 1
             }
-            public float GetTime() => float.Parse(_time.ToString());
+            public float GetTime() => _time.Value;
             public float? _time { get; set; }
             public int? _lineIndex { get; set; }
             public Type? _type { get; set; }
@@ -288,6 +302,8 @@ namespace ModChart
         }
         public static string[] NoodleExtensionsPropertyNames => new string[]
         {
+            _height,
+            _attenuation,
             _position,
             _rotation,
             _scale,
@@ -297,6 +313,59 @@ namespace ModChart
             _dissolveArrow,
             _time
         };
+
+        public static void Append(ICustomDataMapObject MapObject, ICustomDataMapObject AppendObject, AppendPriority type)
+        {
+            switch (type)
+            {
+                case AppendPriority.Low:
+                    foreach (var property in MapObject.GetType().GetProperties())
+                        if (property.GetValue(MapObject) == null)
+                            property.SetValue(MapObject, property.GetValue(AppendObject));
+
+                    if (AppendObject._customData != null)
+                    {
+                        MapObject._customData = TreeDictionary.Merge(
+                            MapObject._customData,
+                            AppendObject._customData,
+                            TreeDictionary.MergeType.Dictionaries | TreeDictionary.MergeType.Objects,
+                            TreeDictionary.MergeBindingFlags.HasValue);
+                    }
+                    break;
+                case AppendPriority.High:
+                    foreach (var property in MapObject.GetType().GetProperties())
+                        if (property.GetValue(AppendObject) != null)
+                            property.SetValue(MapObject, property.GetValue(AppendObject));
+
+                    if (MapObject._customData != null)
+                    {
+                        MapObject._customData = TreeDictionary.Merge(
+                            AppendObject._customData,
+                            MapObject._customData,
+                            TreeDictionary.MergeType.Dictionaries | TreeDictionary.MergeType.Objects,
+                            TreeDictionary.MergeBindingFlags.HasValue);
+                    }
+                    break;
+            }
+        }
+        public enum AppendPriority
+        {
+            Low,
+            High
+        }
+        public enum MapObjectType
+        {
+            Obstacle,
+            Note,
+            Event
+        }
+        public static ICustomDataMapObject GetInstance(MapObjectType type) =>
+            type == MapObjectType.Note ? (ICustomDataMapObject)new Note() :
+            type == MapObjectType.Obstacle ? (ICustomDataMapObject)new Obstacle() :
+            type == MapObjectType.Event ? (ICustomDataMapObject)new Event() :
+            throw new Exception();
+
+
     }
 
 

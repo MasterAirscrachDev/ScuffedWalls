@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace ScuffedWalls
 {
@@ -18,9 +17,11 @@ namespace ScuffedWalls
     }
     public class ScuffedRequestParser : IRequestParser<ScuffedRequest, BeatMap>
     {
+        public static ScuffedRequestParser Instance { get; private set; }
         public static Rainbow WorkspaceRainbow = new Rainbow();
         public BeatMap Result => _latestRunBeatMap;
         public ScuffedRequest CurrentRequest => _request;
+        public List<ContainerRequest> CustomFunctions => CurrentRequest.CustomFunctionRequests;
         public List<Workspace> Workspaces => _workspaces;
 
         private BeatMap _latestRunBeatMap;
@@ -30,15 +31,22 @@ namespace ScuffedWalls
 
         public ScuffedRequestParser(ScuffedRequest request)
         {
+            Instance = this;
             _request = request;
-        }
-        public static T GetParam<T>(string name, T defaultval, Func<string, T> converter, IEnumerable<Parameter> parameters)
+        } 
+        
+        
+        /*
+          
+        public static T GetParam<T>(string name, T defaultval, Func<string, T> converter, Lookup<Parameter> parameters)
         {
             if (!parameters.Any(p => p.Clean.Name.Equals(name))) return defaultval;
             return converter(parameters.Where(p => p.Clean.Name.Equals(name)).First().StringData);
         }
+        */
         public BeatMap GetResult()
         {
+
             _workspaceRequestEnumerator = CurrentRequest.WorkspaceRequests.GetEnumerator();
             _workspaces = new List<Workspace>();
 

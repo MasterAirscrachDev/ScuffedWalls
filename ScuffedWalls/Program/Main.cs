@@ -9,13 +9,12 @@
 
     static class ScuffedWalls
     {
-
-        public static string ver => "v1.5.2-dev";
+        public const string Version = "v2.0.6-dev (\"i promise its better this time\" version)";
         static void Main(string[] args)
         {
             Utils.Initialize(args);
 
-            Print($"ScuffedWalls {ver}");
+            Print($"ScuffedWalls {Version}");
             Print(Utils.ScuffedConfig.MapFolderPath);
 
 
@@ -41,10 +40,10 @@
             ScuffedRequest Request = null;
             Debug.TryAction(() => 
             {
-                Request = (ScuffedRequest)new ScuffedRequest().Setup(Utils.ScuffedWallFile.Lines);
+                Request = (ScuffedRequest)new ScuffedRequest().SetupFromLines(Utils.ScuffedWallFile.Parameters);
             },e => 
             {
-                Print($"Error parsing ScuffedWall file ERR: {(e.InnerException ?? e).Message}", LogSeverity.Critical);
+                Print($"Error parsing ScuffedWall file ERROR: {(e.InnerException ?? e).Message}", LogSeverity.Critical);
             });
 
             ScuffedRequestParser Parser = null;
@@ -54,32 +53,42 @@
                 Parser.GetResult();
             },e => 
             {
-                Print($"Error executing ScuffedRequest ERR: {(e.InnerException ?? e).Message}", LogSeverity.Critical);
+                Print($"Error executing ScuffedRequest ERROR: {(e.InnerException ?? e).Message}", LogSeverity.Critical);
             });
+            Debug.TryAction(() =>
+            {
+                Print($"Writing to {new FileInfo(Utils.ScuffedConfig.MapFilePath).Name}", ShowStackFrame: false);
+                File.WriteAllText(Utils.ScuffedConfig.MapFilePath, JsonSerializer.Serialize(Parser.Result, new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = Utils.ScuffedConfig.PrettyPrintJson }));
+                
+                Utils.DiscordRPCManager.CurrentMap = Parser.Result;
+                Utils.DiscordRPCManager.Workspaces = Parser.Workspaces.Count();
 
-            //write to json file
-            Print($"Writing to {new FileInfo(Utils.ScuffedConfig.MapFilePath).Name}");
-            File.WriteAllText(Utils.ScuffedConfig.MapFilePath, JsonSerializer.Serialize(Parser.Result, new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = Utils.ScuffedConfig.PrettyPrintJson }));
-
-            //add in requirements
-            Utils.Check(Parser.Result);
-
-            Print($"Writing to Info.dat");
-            File.WriteAllText(Utils.ScuffedConfig.InfoPath, JsonSerializer.Serialize(Utils.Info, new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = true }));
-
-
-            Utils.DiscordRPCManager.CurrentMap = Parser.Result;
-            Utils.DiscordRPCManager.Workspaces = Parser.Workspaces.Count();
+                Print(string.Join(' ', Parser.Result.Stats.Select(st => $"[{st.Value} {st.Key.MakePlural(st.Value)}]")), ShowStackFrame: false);
+            }, e =>
+            {
+                Print($"Error saving to map file ERROR: {(e.InnerException ?? e).Message}", LogSeverity.Critical);
+            }); 
+            Print("Saving Config");
+            File.WriteAllText(Utils.ConfigFileName, JsonSerializer.Serialize(Utils.ScuffedConfig, new JsonSerializerOptions() { IgnoreNullValues = true, WriteIndented = true }));
+           
         }
-        public static void Print(string Message, LogSeverity Severity = LogSeverity.Info, ConsoleColor? Color = null, StackFrame StackFrame = null, bool ShowStackFrame = true)
+        public static void Print(string Message, LogSeverity Severity = LogSeverity.Info, ConsoleColor? Color = null, StackFrame StackFrame = null, bool ShowStackFrame = true, string OverrideStackFrame = null)
         {
+            if (string.IsNullOrEmpty(Message)) return;
+
             if (Color.HasValue) Console.ForegroundColor = Color.Value;
             else Console.ForegroundColor = sevColor[(int)Severity];
 
             var methodInfo = (StackFrame ?? new StackTrace().GetFrame(1)).GetMethod();
             string stack = methodInfo.DeclaringType.Name.Replace("ScuffedWalls", "Main");
+            string message = 
+                OverrideStackFrame != null ? 
+                $"{OverrideStackFrame} - {Message}" :
+                (ShowStackFrame && Severity < LogSeverity.Error ?
+                $"{stack} - {Message}" :
+                Message);
 
-            Console.WriteLine($"[{Severity}]{(ShowStackFrame && Severity != LogSeverity.Error ? " " + stack : "")} - {Message}");
+            Console.WriteLine($"[{Severity}] {message}");
 
             Console.ResetColor();
 
@@ -100,7 +109,7 @@
             {
                 if (debugStats[i] > 0) stat.Add($"[{debugStats[i]} {((LogSeverity)i).ToString().MakePlural(debugStats[i])}]");
             }
-            Print(string.Join(' ', stat), Color: getHighestSev());
+            Print(string.Join(' ', stat), Color: getHighestSev(), ShowStackFrame: false);
             debugStats = new int[logSevCount];
 
             ConsoleColor getHighestSev()

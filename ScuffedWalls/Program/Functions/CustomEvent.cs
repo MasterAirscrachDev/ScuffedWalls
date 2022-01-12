@@ -3,137 +3,90 @@ using System.Text.Json;
 
 namespace ScuffedWalls.Functions
 {
-    [SFunction("PointDefinition")] 
+    [SFunction("PointDefinition")]
     class PointDefinition : ScuffedFunction
     {
-        public override void Run()
+        string name;
+        object[][] points;
+        protected override void Init()
         {
-            FunLog();
-
-
-            string name = GetParam("name", "unimplemented_pointdefinition", p => p);
-            object[][] points = GetParam("points", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]"));
-            
+            name = GetParam("name", "unimplemented_pointdefinition", p => p);
+            points = GetParam("points", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]"));
+        }
+        protected override void Update()
+        {
             InstanceWorkspace.PointDefinitions.Add(new TreeDictionary()
             {
                 ["_name"] = name,
                 ["_points"] = points
             });
-
-            ConsoleOut("PointDefinition", 1, Time, "PointDefinition");
-
-            Parameter.ExternalVariables.RefreshAllParameters();
+            RegisterChanges("PointDefinition", 1);
         }
     }
     [SFunction("AnimateTrack")]
     class CustomEventAnimateTrack : ScuffedFunction
     {
-        public Parameter Repeat;
-        public Parameter Beat;
-        public void SetParameters()
+        protected override void Update()
         {
-            Repeat = new Parameter("repeat", "0");
-            Beat = new Parameter("time", Time.ToString());
-            UnderlyingParameters.SetInteralVariables(new Parameter[] { Repeat, Beat });
-        }
-        public override void Run()
-        {
-            SetParameters();
-            int repeatcount = GetParam("repeat", 1, p => int.Parse(p));
-            float repeatTime = GetParam("repeataddtime", 0, p => float.Parse(p));
-            for (float i = 0; i < repeatcount; i++)
+            InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
             {
-                Repeat.StringData = i.ToString();
-                Beat.StringData = (Time + (i * repeatTime)).ToString();
+                ["_time"] = Time,
+                ["_type"] = BeatMap.AnimateTrack,
+                ["_data"] = UnderlyingParameters.CustomEventsDataParse()
+            });
 
-                FunLog();
-
-
-                InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
-                {
-                    ["_time"] = Time + (i * repeatTime),
-                    ["_type"] = "AnimateTrack",
-                    ["_data"] = UnderlyingParameters.CustomEventsDataParse()
-                });
-                Parameter.ExternalVariables.RefreshAllParameters();
-            }
-            ConsoleOut("AnimateTrack", repeatcount, Time, "CustomEvent");
-
+            RegisterChanges("AnimateTrack", 1);
         }
     }
     [SFunction("AssignPathAnimation")]
     class CustomEventAssignpath : ScuffedFunction
     {
-        public Parameter Repeat;
-        public Parameter Beat;
-        public void SetParameters()
+        protected override void Update()
         {
-            Repeat = new Parameter("repeat", "0");
-            Beat = new Parameter("time", Time.ToString());
-            UnderlyingParameters.SetInteralVariables(new Parameter[] { Repeat, Beat });
-        }
-        public override void Run()
-        {
-            SetParameters();
-            int repeatcount = GetParam("repeat", 1, p => int.Parse(p));
-            float repeatTime = GetParam("repeataddtime", 0, p => float.Parse(p));
-            for (float i = 0; i < repeatcount; i++)
+            InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
             {
-                Repeat.StringData = i.ToString();
-                Beat.StringData = (Time + (i * repeatTime)).ToString();
+                ["_time"] = Time,
+                ["_type"] = BeatMap.AssignPathAnimation,
+                ["_data"] = UnderlyingParameters.CustomEventsDataParse()
+            });
 
-                FunLog();
-
-
-                InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
-                {
-                    ["_time"] = Time + (i * repeatTime),
-                    ["_type"] = "AssignPathAnimation",
-                    ["_data"] = UnderlyingParameters.CustomEventsDataParse()
-                });
-                Parameter.ExternalVariables.RefreshAllParameters();
-            }
-            ConsoleOut("AssignPathAnimation", repeatcount, Time, "CustomEvent");
+            RegisterChanges("AssignPathAnimation", 1);
         }
     }
     [SFunction("AssignPlayerToTrack")]
     public class CustomEventPlayerTrack : ScuffedFunction
     {
-        public override void Run()
+        protected override void Update()
         {
-            FunLog();
-
-
-            InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
-            {
-                ["_time"] = Time,
-                ["_type"] = "AssignPlayerToTrack",
-                ["_data"] = UnderlyingParameters.CustomEventsDataParse()
-            });
-            ConsoleOut("AssignPlayerToTrack", 1, Time, "CustomEvent");
-            Parameter.ExternalVariables.RefreshAllParameters();
+            InstanceWorkspace.CustomEvents.Add(new TreeDictionary() { ["_time"] = Time, ["_type"] = BeatMap.AssignPlayerToTrack, ["_data"] = UnderlyingParameters.CustomEventsDataParse() });
+            RegisterChanges("AssignPlayerToTrack", 1);
         }
     }
-    
+
     [SFunction("ParentTrack")]
     public class CustomEventParent : ScuffedFunction
     {
-        public override void Run()
+        protected override void Update()
         {
-            FunLog();
-
-
-            InstanceWorkspace.CustomEvents.Add(new TreeDictionary()
-            {
-                ["_time"] = Time,
-                ["_type"] = "AssignTrackParent",
-                ["_data"] = UnderlyingParameters.CustomEventsDataParse()
+            bool worldpositionstays = GetParam("worldpositionstays", true, p => bool.Parse(p));
+            InstanceWorkspace.CustomEvents.Add(new TreeDictionary() { ["_time"] = Time, ["_type"] = BeatMap.AssignTrackParent, ["_data"] = UnderlyingParameters.CustomEventsDataParse() });
+            RegisterChanges("AssignTrackParent", 1);
+        }
+    }
+    [SFunction("AssignFogTrack")]
+    public class CustomEventFogTrack : ScuffedFunction
+    {
+        protected override void Update()
+        {
+            InstanceWorkspace.CustomEvents.Add(new TreeDictionary() 
+            { 
+              ["_time"] = Time,
+              ["_type"] = BeatMap.AssignFogTrack,
+              ["_data"] = UnderlyingParameters.CustomEventsDataParse() 
             });
-            ConsoleOut("AssignTrackParent", 1, Time, "CustomEvent");
-            Parameter.ExternalVariables.RefreshAllParameters();
+            RegisterChanges("AssignFogTrack", 1);
         }
     }
 
 
-    
 }

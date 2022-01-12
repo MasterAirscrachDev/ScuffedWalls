@@ -14,9 +14,9 @@ namespace ScuffedWalls
         public static Func<string, string> StringConverter => val => val;
         public static Func<string, object> ArrayConverter => val => JsonSerializer.Deserialize<object[]>(val);
         public static Func<string, object> NestedArrayDefaultStringConverter => val => DeserializeDefaultToString<object[][]>($"[{val}]");
-        public static ICustomDataMapObject CustomDataParse(this IEnumerable<Parameter> CustomNoodleData, ICustomDataMapObject Instance)
+        public static ICustomDataMapObject CustomDataParse(this TreeList<Parameter> parameters, ICustomDataMapObject objInstance)
         {
-            Instance._time = GetParam("time", null, p => (float?)float.Parse(p));
+            objInstance._time = GetParam("time", null, p => (float?)float.Parse(p));
             var customdata = new TreeDictionary
             {
                 ["_interactable"] = GetParam("interactable", null, p => (object)bool.Parse(p)),
@@ -26,7 +26,7 @@ namespace ScuffedWalls
                 ["_noteJumpStartBeatOffset"] = GetParam("njsoffset", null, p => (object)float.Parse(p)),
                 ["_track"] = GetParam("track", null, TrackConverter),
                 ["_fake"] = GetParam("fake", null, p => (object)bool.Parse(p)),
-                ["_rotation"] = GetParam("rotation", null, p => JsonSerializer.Deserialize<object[]>(p)),
+                ["_rotation"] = GetParam("rotation", null, p => JsonSerializer.Deserialize<object[]>(p)) ?? GetParam("Crotation", null, p => (object)float.Parse(p)),
                 ["_localRotation"] = GetParam("localrotation", null, p => JsonSerializer.Deserialize<object[]>(p)),
                 ["_position"] = GetParam("position", null, p => JsonSerializer.Deserialize<object[]>(p)),
                 ["_scale"] = GetParam("scale", null, p => JsonSerializer.Deserialize<object[]>(p)),
@@ -73,24 +73,22 @@ namespace ScuffedWalls
 
             if (animation.Any()) customdata["_animation"] = animation;
             if (gradient.Any()) customdata["_lightGradient"] = gradient;
-            if (customdata.Any()) Instance._customData = customdata;
+            if (customdata.Any()) objInstance._customData = customdata;
 
 
             //Console.WriteLine(Instance._customData._animation._definitePosition);
 
-            return Instance;
+            return objInstance;
 
-
-            
 
             T GetParam<T>(string Name, T DefaultValue, Func<string, T> Converter)
             {
-                if (!CustomNoodleData.Any(p => p.Name.ToLower() == Name.ToLower())) return DefaultValue;
+                var param = parameters.Get(Name);
+                if (param == null) return DefaultValue;
                 try
                 {
-                    var filtered = CustomNoodleData.Where(p => p.Name.ToLower() == Name.ToLower()).First();
-                    var converted = Converter(filtered.StringData);
-                    filtered.WasUsed = true;
+                    var converted = Converter(param.StringData);
+                    param.WasUsed = true;
                     return converted;
                 }
                 catch (Exception e)
@@ -114,10 +112,14 @@ namespace ScuffedWalls
             }
         }
 
-        public static TreeDictionary CustomEventsDataParse(this IEnumerable<Parameter> CustomNoodleData)
+        public static TreeDictionary CustomEventsDataParse(this TreeList<Parameter> parameters)
         {
             var customdata = new TreeDictionary()
             {
+                ["_height"] = GetParam("animateheight", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimateheight", null, p => (object)p),
+                ["_attenuation"] = GetParam("animateattenuation", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimateattenuation", null, p => (object)p),
+                ["_startY"] = GetParam("animatestartY", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimatestartY", null, p => (object)p),
+                ["_offset"] = GetParam("animatoffset", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimatoffset", null, p => (object)p),
                 ["_definitePosition"] = GetParam("animatedefiniteposition", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimatedefiniteposition", null, p => (object)p),
                 ["_position"] = GetParam("animateposition", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimateposition", null, p => (object)p),
                 ["_dissolve"] = GetParam("animatedissolve", null, p => JsonSerializer.Deserialize<object[][]>($"[{p}]")) ?? GetParam("defineanimatedissolve", null, p => (object)p),
@@ -141,12 +143,12 @@ namespace ScuffedWalls
 
             T GetParam<T>(string Name, T DefaultValue, Func<string, T> Converter)
             {
-                if (!CustomNoodleData.Any(p => p.Name.ToLower() == Name.ToLower())) return DefaultValue;
+                var param = parameters.Get(Name);
+                if (param == null) return DefaultValue;
                 try
                 {
-                    var filtered = CustomNoodleData.Where(p => p.Name.ToLower() == Name.ToLower()).First();
-                    var converted = Converter(filtered.StringData);
-                    filtered.WasUsed = true;
+                    var converted = Converter(param.StringData);
+                    param.WasUsed = true;
                     return converted;
                 }
                 catch (Exception e)

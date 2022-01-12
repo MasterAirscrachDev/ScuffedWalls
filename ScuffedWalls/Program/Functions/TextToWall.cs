@@ -9,10 +9,8 @@ namespace ScuffedWalls.Functions
     [SFunction("TextToWall")]
     class TextToWall : ScuffedFunction
     {
-        public override void Run()
+        protected override void Update()
         {
-            FunLog();
-
 
             var parsedshit = UnderlyingParameters.CustomDataParse(new BeatMap.Obstacle());
             var isNjs = parsedshit._customData != null && parsedshit._customData["_noteJumpStartBeatOffset"] != null;
@@ -70,9 +68,9 @@ namespace ScuffedWalls.Functions
 
             foreach (var p in UnderlyingParameters)
             {
-                if (p.Name == "line")
+                if (p.Clean.Name == "line")
                 {
-                    lines.Add(p.StringData);
+                    lines.Add(p.Raw.StringData);
                     p.WasUsed = true;
                 }
             }
@@ -80,6 +78,13 @@ namespace ScuffedWalls.Functions
             bool isModel = false;
             if (new FileInfo(Path).Extension.ToLower() == ".dae")isModel = true;
 
+            BeatMap.Obstacle wall = new BeatMap.Obstacle()
+            {
+                _time = Time,
+                _duration = duration,
+                _customData = new TreeDictionary()
+            };
+            BeatMap.Append(wall, UnderlyingParameters.CustomDataParse(new BeatMap.Obstacle()), BeatMap.AppendPriority.High);
 
             lines.Reverse();
             WallText text = new WallText(new TextSettings()
@@ -101,12 +106,7 @@ namespace ScuffedWalls.Functions
                     maxPixelLength = linelength,
                     thicc = thicc,
                     tolerance = compression,
-                    Wall = (BeatMap.Obstacle)new BeatMap.Obstacle()
-                    {
-                        _time = Time,
-                        _duration = duration,
-                        _customData = new TreeDictionary()
-                    }.Append(UnderlyingParameters.CustomDataParse(new BeatMap.Obstacle()), AppendPriority.High)
+                    Wall = wall
                 },
                 ModelSettings = new ModelSettings()
                 {
@@ -128,19 +128,13 @@ namespace ScuffedWalls.Functions
                     
                     NJS = MapNjs,
                     Offset = MapOffset,
-                    Wall = (BeatMap.Obstacle)new BeatMap.Obstacle()
-                    {
-                        _time = Time,
-                        _duration = duration,
-                        _customData = new TreeDictionary()
-                    }.Append(UnderlyingParameters.CustomDataParse(new BeatMap.Obstacle()), AppendPriority.High)
+                    Wall = wall
                 }
             });
             InstanceWorkspace.Walls.AddRange(text.Walls);
             InstanceWorkspace.Notes.AddRange(text.Notes);
-            ConsoleOut("Wall", text.Walls.Length, Time, "TextToWall");
-            if(text.Notes.Any()) ConsoleOut("Note", text.Notes.Length, Time, "TextToWall");
-            Parameter.ExternalVariables.RefreshAllParameters();
+            RegisterChanges("Wall", text.Walls.Length);
+            if(text.Notes.Any()) RegisterChanges("Note", text.Notes.Length);
         }
     }
 

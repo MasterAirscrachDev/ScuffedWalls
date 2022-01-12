@@ -6,10 +6,8 @@ namespace ScuffedWalls.Functions
     [SFunction("Environment", "EnvironmentEnhancement")]
     class EnvironmentEnhancement : ScuffedFunction
     {
-        public override void Run()
+        protected override void Update()
         {
-            FunLog();
-
             InstanceWorkspace.Environment.Add(new TreeDictionary()
             {
                 ["_id"] = GetParam("id", null, p => (object)p),
@@ -24,8 +22,7 @@ namespace ScuffedWalls.Functions
                 ["_rotation"] = GetParam("rotation", null, p => JsonSerializer.Deserialize<object[]>(p)),
                 ["_lightID"] = GetParam("lightid", null, p => (object)int.Parse(p))
             });
-            ConsoleOut("Environment",1,0,"Environment Enhancement");
-            Parameter.ExternalVariables.RefreshAllParameters();
+            RegisterChanges("Environment",1);
         }
     }
 }

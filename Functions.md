@@ -2,6 +2,8 @@
  - [`Overview`](#Overview)
  - [`Functions`](#Functions)
  - [`Workspaces`](#Workspaces)
+ - [`Custom Functions Overview`](#custom-functions-basics)
+ - [`Custom Functions Features`](#custom-functions-features)
  - [`Noodle Extensions/Chroma Properties Syntax`](#noodle-extensionschroma-properties-syntax)
  - [`Math & Functions`](#math--functions)
  - [`Variables`](#Variables)
@@ -39,8 +41,6 @@ All the available functions are listed below
 - [`ModelToWall`](#ModelToWall)
 - [`ImageToWall`](#ImageToWall)
 - [`Environment`](#Environment)
-- [`CloneFromWorkspace`](#CloneFromWorkspace)
-- [`WorkspaceDefault`](#WorkspaceDefault)
 - [`Blackout`](#Blackout)
 - [`Import`](#Import)
 - [`Run`](#Run)
@@ -107,7 +107,108 @@ Workspace: A Different Workspace
   
 ```
 
+# Custom Functions Basics
+A custom function is a `workspace` that can be instantiated multiple times.
 
+You can define a custom function by using the keyword `function` in place of `workspace`
+
+Example
+```
+Function: SpinWall
+
+  0:Wall
+    duration:5 
+    animateLocalRotation:[0,0,0,0],[0,0,180,1]
+
+```
+Defines a custom function which adds one wall with some properties. **Note: this does nothing on its own.**
+
+To use this custom function you can reference it like a regular function.
+
+Example
+```
+Workspace
+
+  0:SpinWall
+
+```
+
+# Custom Functions Features
+CFs have the ability to set variabels as public. Meaning you can change the variables data from outside the CF.
+
+Example
+```
+Function: OhWow
+
+Var: AmazingVariableName
+  data: hi retrx!
+  public:true
+
+0:Log
+  Log:AmazingVariableName
+
+Workspace
+
+0: OhWow
+  AmazingVariableName: bye retrx :(
+
+```
+This example prints to the console: `bye retrx :(`
+
+CFs also have the ability to set a function call to the time that the CF was called from.
+
+Example
+```
+Function: NeatO
+
+XXX:Wall
+
+Workspace
+
+7.2: NeatO
+
+```
+This example adds a wall at beat 7.2
+
+Practical use example:
+
+cleaning up text to wall
+```
+function:Subtitle
+
+var:line
+  data:????
+  public:true
+
+  
+var:duration
+  data:1
+  public:true
+
+xxx:texttowall
+  definitedurationbeats:duration
+  Path:font.dae
+  line:line
+  letting:2
+  leading:-1
+  thicc:12
+  spreadspawntime:1
+  size:0.1
+  position:[0,2]
+  animatedefiniteposition:[0,0,0,0]
+
+workspace:text
+
+5.25:Subtitle
+  line:You know you gotta...
+  duration:1.25
+
+  
+6.5:Subtitle
+  line:TRY
+  duration:8
+
+```
 
 # Noodle Extensions/Chroma Properties Syntax
 Noodle Extensions/Chroma/Other properties that can be used on most functions
@@ -331,8 +432,7 @@ Appending means to add on or to merge two sets of data. The append function will
  - Function Time => starting beat of selection (only append notes after...)
  - toBeat: float => ending beat of selection (only append notes before...)
  - appendTechnique: int(0-2)
- - onTrack: string, only appends to walls on this track
- - selectlineindex: int,int,int (defaults to 0,1,2,3)
+ - select: bool, only applies the affect if the value is true. example `select:{_lineLayer = 0}` will only append to walls with linelayer 0
  - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
   Example
@@ -371,9 +471,8 @@ Appends data to notes between the function time and endtime (toBeat)
 
  - Function Time => starting beat of selection (only append notes after...)
  - toBeat: float => ending beat of selection (only append notes before...)
- - selecttype: int,int,int (defaults to 0,1,2,3), only appends to notes with the specified type(s), see [`here`](https://bsmg.wiki/mapping/map-format.html#notes-2) for info on \_type
  - appendTechnique: int(0-2)
- - onTrack: string, only appends to notes on this track
+ - select: bool, only applies the affect if the value is true. example `select:{_lineLayer = 0}` will only append to notes with linelayer 0
  - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
  
   Example
@@ -552,6 +651,7 @@ Rizthesnuggies [`Intro to ModelToWall`](https://youtu.be/FfHGRbUdV_k) tutorial
 ```
 
 ## ImageToWall
+(Only works on versions less than v2.0.0)
 
 Constructs an image out of walls as pixels
 
@@ -596,6 +696,8 @@ Rizthesnuggies [`Intro to ImageToWall`](https://youtu.be/Cxbc4llIq3k) tutorial
 
 makes a chroma environment enhancement, idk what this does but i heard [`its pretty cool`](https://github.com/Aeroluna/Chroma#environment-enhancement)
 
+(Airscrach) This Took Me An Entire Day To Figure Out So Heres A [`Quickstart Guide`](Environment%20Id%20Quick%20Guide.md)
+
 - id: string
 - track: string
 - lookupmethod: string
@@ -618,55 +720,7 @@ makes a chroma environment enhancement, idk what this does but i heard [`its pre
     
     #takes the double color laser and changes position and adds it to a track
 ```
- 
- 
-# CloneFromWorkspace
-clones mapobjects from a different workspace by the index or by the name. the time of the function is the beat that starts cloning from.
 
-- Type: int,int,int (defaults to 0,1,2,3) 0 being walls, 1 being notes, 2 being lights, 3 being custom events & NOT point definitions
-- Index: int, the index of the workspace you want to clone from. It's either one or the other.
-- Name:string, the name of the workspace you want to clone from. It's either one or the other.
-- addTime: float, shifts the cloned things by this amount.
-- toBeat: float, the beat where to stop cloning from.
-
- Example
-```ruby
-Workspace:wtf workspace
-64:wall
-
-Workspace:hahaball
-
-Workspace
-
-	#adds in one wall at beat 97, a copy of "wtf workspace" shifted up by 32 beats
-	#now in the map there will be a wall at 64 and a wall at 96
- 25:CloneFromWorkspace
-   Name:wtf workspace
-   Type:0,1,2
-   toBeat:125
-   addTime:32
-```
- 
-## WorkspaceDefault
-adds a parameter to every function call in a workspace
-
- - Enabled: bool, if set to false, no map objects in the workspace will be added to the map
- - any other parameters will be added to every function in the workspace
-
-Example
-```ruby
-Workspace
-
-0:Default
-  NJS:25
-  
-0:Wall
-
-0:Note
-
-   #Both the wall and the note will have NJS 25 applied to them
-```
- 
 ## Blackout
 adds a single light off event at the beat number. why? because why not.
 
@@ -721,8 +775,6 @@ adds in map objects from other map.dat files
    toBeat:180
 ```
 
-
-
 ## Wall
 (repeatable)
 makes a wall
@@ -731,11 +783,11 @@ Rizthesnuggies [`Intro to Wall & Note`](https://youtu.be/hojmJ1UZcb8) tutorial
 
 - duration: float
 - definitedurationbeats: float, makes the walls stay around for exactly this long in beats
- - definitedurationseconds: float, makes the walls stay around for exactly this long in seconds
- - definitetime: beats/seconds, makes the walls jump in at exactly the function time in seconds or beats
+- definitedurationseconds: float, makes the walls stay around for exactly this long in seconds
+- definitetime: beats/seconds, makes the walls jump in at exactly the function time in seconds or beats
 - repeat: int, amount of times to repeat
 - repeatAddTime: float
- - any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
+- any of [`these properties`](Functions.md#noodle-extensionschroma-properties-syntax)
 
  Example
 ```ruby
